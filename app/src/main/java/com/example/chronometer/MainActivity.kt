@@ -20,7 +20,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,17 +53,20 @@ class MainActivity : ComponentActivity() {
 fun ChronometerScreen(
     modifier: Modifier = Modifier
 ) {
-    var elapsedTime by remember {
+    var elapsedTime by rememberSaveable {
         mutableLongStateOf(0L)
     }
-    var isRunning by remember {
+    var isRunning by rememberSaveable {
         mutableStateOf(false)
+    }
+    var startTime by rememberSaveable {
+        mutableLongStateOf(0L)
     }
 
     LaunchedEffect(isRunning) {
         while (isRunning) {
+            elapsedTime = (System.currentTimeMillis() - startTime) / 1000
             delay(1000.milliseconds)
-            elapsedTime++
         }
     }
 
@@ -89,7 +92,10 @@ fun ChronometerScreen(
 
         Button(
             onClick = {
-                isRunning = true
+                if (!isRunning){
+                    startTime = System.currentTimeMillis() - elapsedTime * 1000
+                    isRunning = true
+                }
             },
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.width(100.dp)
@@ -99,7 +105,10 @@ fun ChronometerScreen(
 
         Button(
             onClick = {
-                isRunning = false
+                if (isRunning){
+                    elapsedTime = (System.currentTimeMillis() - startTime) / 1000
+                    isRunning = false
+                }
             },
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.width(100.dp)
@@ -111,6 +120,7 @@ fun ChronometerScreen(
             onClick = {
                 isRunning = false
                 elapsedTime = 0L
+                startTime = 0L
             },
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.width(100.dp)
