@@ -98,7 +98,9 @@ fun ChronometerScreen(
         }
 
         Button(
-            onClick = { },
+            onClick = {
+                isRunning = false
+            },
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.width(100.dp)
         ) {
