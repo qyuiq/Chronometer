@@ -16,12 +16,20 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.chronometer.ui.theme.ChronometerTheme
+import kotlinx.coroutines.delay
+import kotlin.time.Duration.Companion.milliseconds
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +53,23 @@ class MainActivity : ComponentActivity() {
 fun ChronometerScreen(
     modifier: Modifier = Modifier
 ) {
+    var elapsedTime by remember {
+        mutableLongStateOf(0L)
+    }
+    var isRunning by remember {
+        mutableStateOf(false)
+    }
+
+    LaunchedEffect(isRunning) {
+        while (isRunning) {
+            delay(1000.milliseconds)
+            elapsedTime++
+        }
+    }
+
+
+
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -54,7 +79,7 @@ fun ChronometerScreen(
     ) {
 
         Text(
-            text = "00:00",
+            text = formatTime(elapsedTime),
             fontSize = 48.sp
         )
 
@@ -63,7 +88,9 @@ fun ChronometerScreen(
         )
 
         Button(
-            onClick = { },
+            onClick = {
+                isRunning = true
+            },
             shape = RoundedCornerShape(8.dp),
             modifier = Modifier.width(100.dp)
         ) {
@@ -86,6 +113,17 @@ fun ChronometerScreen(
             Text("Reset")
         }
     }
+}
+
+fun formatTime(seconds: Long): String{
+    val minutes = seconds / 60
+    val remainingSeconds = seconds % 60
+    return String.format(
+        locale = null,
+        "%02d:%02d",
+        minutes,
+        remainingSeconds
+    )
 }
 
 
